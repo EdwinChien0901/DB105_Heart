@@ -1,0 +1,34 @@
+[
+  {
+  "type": "template",
+  "altText": "this is a buttons template",
+  "template": {
+    "type": "buttons",
+    "actions": [
+      {
+        "type": "message",
+        "label": "熱門景點 1",
+        "text": "動作 1"
+      },
+      {
+        "type": "message",
+        "label": "熱門景點 2",
+        "text": "動作 2"
+      },
+      {
+        "type": "message",
+        "label": "熱門景點 3",
+        "text": "動作 3"
+      },
+      {
+        "type": "message",
+        "label": "熱門景點 4",
+        "text": "動作 4"
+      }
+    ],
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJBqZ60tcWFH5TvZ9KU5DEj7WBllMqRWnuc-ZouaONUFj08G7q",
+    "title": "推薦 の熱門景點",
+    "text": "-"
+  }
+}
+]

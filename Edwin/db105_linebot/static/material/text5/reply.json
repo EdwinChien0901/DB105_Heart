@@ -1,0 +1,32 @@
+[
+  {
+  "type": "template",
+  "altText": "this is a buttons template",
+  "template": {
+    "type": "buttons",
+    "actions": [
+      {
+        "type": "postback",
+        "label": "人文風格",
+        "text": "你想走人文路線的旅行！",
+        "data": "博物館 廟宇 老街 歷史 藝術 展覽 車站 異國"
+      },
+      {
+        "type": "postback",
+        "label": "自然風格",
+        "text": "你想走自然風格的旅行！",
+        "data": "溫泉 農場 夜景 秘境 花海 步道 自然 露營"
+      },
+      {
+        "type": "postback",
+        "label": "購物觀光",
+        "text": "你想走購物觀光格的旅行！",
+        "data": "餐廳 美食 夜市 咖啡廳 遊樂園 園區 觀光工廠"
+      }
+    ],
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJR76mkhKa_kAhOeoUdq6rGjhxpPISR59yUPgh8Y4OCELmjVNq",
+    "title": "我想喜歡這種類型的旅行!!!",
+    "text": "-"
+  }
+}
+]

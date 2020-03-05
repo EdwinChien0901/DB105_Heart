@@ -1,0 +1,88 @@
+[
+  {
+  "type": "template",
+  "altText": "this is a carousel template",
+  "template": {
+    "type": "carousel",
+    "actions": [],
+    "columns": [
+      {
+        "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL1Sbskzvrbq5tRdq8OTg5qLSlid4AhmOTH00CEsO1lF0ibuhk",
+        "title": "雙北",
+        "text": "-",
+        "actions": [
+          {
+            "type": "postback",
+            "label": "熱門景點",
+            "text": "來這些景點拍照上傳，解鎖您的成就吧！！！",
+            "data": "資料 1"
+          },
+          {
+            "type": "postback",
+            "label": "拍照解鎖",
+            "text": "上傳照片，解鎖您的成就吧！",
+            "data": "資料 2"
+          }
+        ]
+      },
+      {
+        "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpaGtQD1rNM3-y2yznUTsNtLv-VGtm5XbHQvDQAOiS3Csw_Wkn",
+        "title": "基隆",
+        "text": "-",
+        "actions": [
+          {
+            "type": "postback",
+            "label": "熱門景點",
+            "text": "來這些景點拍照上傳，解鎖您的成就吧！！！",
+            "data": "資料 1"
+          },
+          {
+            "type": "postback",
+            "label": "拍照解鎖",
+            "text": "上傳照片，解鎖您的成就吧！",
+            "data": "資料 2"
+          }
+        ]
+      },
+      {
+        "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZPgQmHgy68slpmRlUIDJ-_r4QugZW3aj1xG-2u_Mrwv4CsKS5",
+        "title": "宜蘭",
+        "text": "-",
+        "actions": [
+          {
+            "type": "postback",
+            "label": "熱門景點",
+            "text": "來這些景點拍照上傳，解鎖您的成就吧！！！",
+            "data": "資料 1"
+          },
+          {
+            "type": "postback",
+            "label": "拍照解鎖",
+            "text": "來這些景點拍照，解鎖您的成就吧！！！",
+            "data": "資料 1"
+          }
+        ]
+      },
+      {
+        "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpwLN7gdRhV7lCZeXZCJl3A-cl2FL4w4AUnfCYtzHtKwwX7bjT",
+        "title": "桃園",
+        "text": "-",
+        "actions": [
+          {
+            "type": "postback",
+            "label": "熱門景點",
+            "text": "來這些景點拍照上傳，解鎖您的成就吧！！！",
+            "data": "資料 1"
+          },
+          {
+            "type": "postback",
+            "label": "拍照解鎖",
+            "text": "來這些景點拍照，解鎖您的成就吧！！！",
+            "data": "上傳您的照片吧！"
+          }
+        ]
+      }
+    ]
+  }
+}
+]

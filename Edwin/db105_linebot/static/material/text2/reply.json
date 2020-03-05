@@ -1,0 +1,38 @@
+[
+  {
+  "type": "template",
+  "altText": "this is a buttons template",
+  "template": {
+    "type": "buttons",
+    "actions": [
+      {
+        "type": "postback",
+        "label": "雨天備案",
+        "text": "你喜歡室內的旅程!!!",
+        "data": "博物館 餐廳 咖啡廳"
+      },
+      {
+        "type": "postback",
+        "label": "戶外玩樂",
+        "text": "你喜歡戶外玩樂的旅程!!!",
+        "data": "遊樂園 農場 公園 夜景"
+      },
+      {
+        "type": "postback",
+        "label": "半戶外方案",
+        "text": "你喜歡半戶外的旅程!!!",
+        "data": "校園 園區 廟宇 老街 觀光工廠 溫泉 夜市 車站"
+      },
+      {
+        "type": "postback",
+        "label": "崇尚自然",
+        "text": "你喜歡大自然的旅程!!!",
+        "data": "露營 秘境 花海 步道 自然"
+      }
+    ],
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKdSABbl3nQ6Jttqlf_7DuVZXV9hz3KVISpqFsY7zf73TYh6ZE",
+    "title": "您喜歡偏向室內or戶外的旅程!!!",
+    "text": "-"
+  }
+}
+]

@@ -1,0 +1,32 @@
+[
+  {
+  "type": "template",
+  "altText": "this is a buttons template",
+  "template": {
+    "type": "buttons",
+    "actions": [
+      {
+        "type": "postback",
+        "label": "靜態",
+        "text": "您的旅程偏好靜態！",
+        "data": "博物館 餐廳 咖啡廳 展覽 廟宇 老街 觀光工廠 溫泉 夜市 車站 捷運 美食"
+      },
+      {
+        "type": "postback",
+        "label": "能動能靜",
+        "text": "您的旅程偏好半靜半動！",
+        "data": "遊樂園 農場 公園 夜景 校園 園區"
+      },
+      {
+        "type": "postback",
+        "label": "動態",
+        "text": "您的旅程偏好動態！",
+        "data": "露營 秘境 花海 步道 自然"
+      }
+    ],
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz6N6wK8MxiRmHDuGMdZLHxsfg9M9BF-37zj2BoW3Qzkia4dr_",
+    "title": "您的旅程偏好 - 動態 or 靜態？",
+    "text": "-"
+  }
+}
+]

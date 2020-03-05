@@ -1,0 +1,38 @@
+[
+  {
+  "type": "template",
+  "altText": "this is a buttons template",
+  "template": {
+    "type": "buttons",
+    "actions": [
+      {
+        "type": "postback",
+        "label": "家人",
+        "text": "你想和家人一起去~",
+        "data": "親子"
+      },
+      {
+        "type": "postback",
+        "label": "朋友",
+        "text": "你想和朋友一起去~",
+        "data": "資料 2"
+      },
+      {
+        "type": "postback",
+        "label": "情侶",
+        "text": "你想和情侶一起去~",
+        "data": "情侶"
+      },
+      {
+        "type": "postback",
+        "label": "寵物",
+        "text": "你想和寵物一起去~",
+        "data": "寵物"
+      }
+    ],
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrMn96AtT9WleRDvcxDahqFmJhvWnRntsm9NNZxVQ_N1HFxybu",
+    "title": "我想和  __ 一起去 ！",
+    "text": "-"
+  }
+}
+]
