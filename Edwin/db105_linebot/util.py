@@ -1,6 +1,8 @@
 from confluent_kafka import Producer
 import redis
 from elasticsearch import Elasticsearch
+import numpy as np
+import os, cv2
 
 siteList = ["基隆","台北","宜蘭","桃園"]
 
@@ -66,9 +68,9 @@ def getProducer():
 
     return producer
 
-def getRedis():
-    r = redis.Redis(host="34.85.107.158", port=6379, decode_responses=True)
-
+def getRedis(isDecode):
+    r = redis.Redis(host="34.85.107.158", port=6379, decode_responses=isDecode)
+    #r = redis.Redis(host="192.168.11.129", port=6379, decode_responses=isDecode)
     return r
 
 def getTemplateJson():
@@ -94,3 +96,18 @@ def insertELK(idx, doc):
     #es = Elasticsearch('http://192.168.11.129:9200')
     es = Elasticsearch('http://35.194.224.128:9200')
     res = es.index(index=idx, doc_type='elk', body=doc)
+
+def setRedisImg(lineToken, imgByte):
+    r = getRedis(True)
+    r.set(lineToken, imgByte)
+
+def getRedisImg(lineToken):
+    r = getRedis(False)
+    img1_bytes_ = r.get(lineToken)
+    print(img1_bytes_)
+    decoded = cv2.imdecode(np.frombuffer(img1_bytes_, np.uint8), 1)
+    fileName = "./{0}.jpg".format(lineToken)
+    cv2.imwrite(fileName.format(), decoded)
+
+    return os.path.abspath(fileName)
+

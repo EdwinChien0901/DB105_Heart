@@ -1,9 +1,11 @@
 from confluent_kafka import Producer
 import redis
 import sys, datetime
-import os
+import os, cv2
 import util
+import numpy as np
 import requests
+import urllib
 from io import BytesIO
 
 path1 = os.getcwd()
@@ -151,15 +153,24 @@ from linebot.models import (
 def process_text_message(event):
     #print("message:", event.message)
     #print("type:", event.message.type)
-    # 讀取本地檔案，並轉譯成消息
+    # 讀取圖片檔做影像辨視
     if event.message.type == "image":
-        imgUrl = "https://api.line.me/v2/bot/message/{0}/content".format(event.message.id)
-        response = requests.get(imgUrl)
-        img = BytesIO(response.content)
-        print("token:", event.reply_token)
-        r = util.getRedis()
-        r.set(event.reply_token, img)
+        message_content = line_bot_api.get_message_content(event.message.id)
+        with open("./{0}.jpg".format(event.reply_token), 'wb') as fd:
+            for chunk in message_content.iter_content():
+                fd.write(chunk)
+
+        img1 = cv2.imread("./{0}.jpg".format(event.reply_token), 1)
+        retval, buffer = cv2.imencode('.jpg', img1)
+        img1_bytes = np.array(buffer).tostring()
+
+        #print("token:", event.reply_token)
+        util.setRedisImg(event.reply_token, img1_bytes)
+
+        file = util.getRedisImg(event.reply_token)
+        #print("file:", file)
     else:
+        #讀取文字訊息
         result_message_array = []
         if event.message.text in os.listdir(r'./static/material'):
             replyJsonPath = r"./static/material/{0}/reply.json".format(event.message.text)
