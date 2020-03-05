@@ -13,15 +13,15 @@
         "actions": [
           {
             "type": "postback",
-            "label": "熱門景點",
+            "label": "照片上傳",
             "text": "來這些景點拍照上傳，解鎖您的成就吧！！！",
-            "data": "資料 1"
+            "data": "TPE_Photo"
           },
           {
             "type": "postback",
             "label": "拍照解鎖",
             "text": "上傳照片，解鎖您的成就吧！",
-            "data": "資料 2"
+            "data": "TPE_Camera"
           }
         ]
       },
@@ -32,15 +32,15 @@
         "actions": [
           {
             "type": "postback",
-            "label": "熱門景點",
+            "label": "照片上傳",
             "text": "來這些景點拍照上傳，解鎖您的成就吧！！！",
-            "data": "資料 1"
+            "data": "KL_Photo"
           },
           {
             "type": "postback",
             "label": "拍照解鎖",
             "text": "上傳照片，解鎖您的成就吧！",
-            "data": "資料 2"
+            "data": "KL_Camera"
           }
         ]
       },
@@ -51,15 +51,15 @@
         "actions": [
           {
             "type": "postback",
-            "label": "熱門景點",
+            "label": "照片上傳",
             "text": "來這些景點拍照上傳，解鎖您的成就吧！！！",
-            "data": "資料 1"
+            "data": "IL_Photo"
           },
           {
             "type": "postback",
             "label": "拍照解鎖",
             "text": "來這些景點拍照，解鎖您的成就吧！！！",
-            "data": "資料 1"
+            "data": "IL_Camera"
           }
         ]
       },
@@ -70,15 +70,15 @@
         "actions": [
           {
             "type": "postback",
-            "label": "熱門景點",
+            "label": "照片上傳",
             "text": "來這些景點拍照上傳，解鎖您的成就吧！！！",
-            "data": "資料 1"
+            "data": "TY_Photo"
           },
           {
             "type": "postback",
             "label": "拍照解鎖",
             "text": "來這些景點拍照，解鎖您的成就吧！！！",
-            "data": "上傳您的照片吧！"
+            "data": "TY_Camera"
           }
         ]
       }
