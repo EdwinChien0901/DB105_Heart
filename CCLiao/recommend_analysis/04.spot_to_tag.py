@@ -53,4 +53,4 @@ for i, nn in enumerate(data_df['spot']):
 		print(i)
 print(spot_tag_df)
 print(spot_tag_df.sum())
-# spot_tag_df.to_csv('spot_tag_count.csv',index=False)
+spot_tag_df.to_csv('spot_tag_count.csv',index=False)
