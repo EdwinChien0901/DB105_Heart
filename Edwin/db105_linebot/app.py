@@ -3,6 +3,8 @@ import redis
 import sys, datetime
 import os
 import util
+import requests
+from io import BytesIO
 
 path1 = os.getcwd()
 print(path1)
@@ -144,61 +146,84 @@ from linebot.models import (
 )
 
 # 文字消息處理
-@handler.add(MessageEvent,message=TextMessage)
+#@handler.add(MessageEvent,message=TextMessage)
+@handler.add(MessageEvent)
 def process_text_message(event):
+    #print("message:", event.message)
+    #print("type:", event.message.type)
     # 讀取本地檔案，並轉譯成消息
-    result_message_array =[]
-    if event.message.text in os.listdir(r'./static/material'):
-        replyJsonPath = r"./static/material/{0}/reply.json".format(event.message.text)
-        result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
-
-        # 發送
-        line_bot_api.reply_message(
-            event.reply_token,
-            result_message_array
-        )
-    elif event.message.text in util.getSiteList():
-        prod = util.getProducer()
-        # 步驟3. 指定想要發佈訊息的topic名稱
-        topicName = 'test1'
-        util.sendKafkaMsg(topicName, event.message.text, event.reply_token)
-
-        re = util.getRedis()
-        tnow = datetime.datetime.now()
-
-        value = re.get(event.reply_token)
-        try:
-            while value == None:
-                value = re.get(event.reply_token)
-
-                diff = (datetime.datetime.now() - tnow).total_seconds()
-                print("seconds:", diff)
-                assert diff < 30, "over time error"
-        except AssertionError as error:
-            print(error)
-            return
-
-        print(value)
-
-        siteList = value.split(",")
-        print("siteList:", siteList)
-        replyMsg = util.getTemplateJson();
-        for i, site in enumerate(siteList):
-            replyMsg = replyMsg.replace("site{}".format(i + 1), site)
-
-        print("replyMsg:", replyMsg)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
-        )
+    if event.message.type == "image":
+        imgUrl = "https://api.line.me/v2/bot/message/{0}/content".format(event.message.id)
+        response = requests.get(imgUrl)
+        img = BytesIO(response.content)
+        print("token:", event.reply_token)
+        r = util.getRedis()
+        r.set(event.reply_token, img)
     else:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage.new_from_json_dict(json.loads(util.getUseMenuJson()))
-        )
+        result_message_array = []
+        if event.message.text in os.listdir(r'./static/material'):
+            replyJsonPath = r"./static/material/{0}/reply.json".format(event.message.text)
+            result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
 
+            # 發送
+            line_bot_api.reply_message(
+                event.reply_token,
+                result_message_array
+            )
+        elif event.message.text in util.getSiteList():
+            prod = util.getProducer()
+            # 步驟3. 指定想要發佈訊息的topic名稱
+            topicName = 'test1'
+            util.sendKafkaMsg(topicName, event.message.text, event.reply_token)
+
+            re = util.getRedis()
+            tnow = datetime.datetime.now()
+
+            value = re.get(event.reply_token)
+            try:
+                while value == None:
+                    value = re.get(event.reply_token)
+
+                    diff = (datetime.datetime.now() - tnow).total_seconds()
+                    print("seconds:", diff)
+                    assert diff < 30, "over time error"
+            except AssertionError as error:
+                print(error)
+                return
+
+            print(value)
+
+            siteList = value.split(",")
+            print("siteList:", siteList)
+            replyMsg = util.getTemplateJson();
+            for i, site in enumerate(siteList):
+                replyMsg = replyMsg.replace("site{}".format(i + 1), site)
+
+            print("replyMsg:", replyMsg)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
+            )
+        else:
+            return
+            # line_bot_api.reply_message(
+            #    event.reply_token,
+            #    TextSendMessage.new_from_json_dict(json.loads(util.getUseMenuJson()))
+            # )
+
+#@handler.add(MessageEvent,message=ImageSendMessage)
+#def process_image_message(event):
+#    print("https://api.line.me/v2/bot/message/{0}/content".format(event.message.id))
 
 from urllib.parse import parse_qs
+
+# 引入相關套件
+from linebot.models import (
+    MessageAction, URIAction,
+    PostbackAction, DatetimePickerAction,
+    CameraAction, CameraRollAction, LocationAction,
+    QuickReply, QuickReplyButton
+)
 
 @handler.add(PostbackEvent)
 def process_postback_event(event):
@@ -241,6 +266,33 @@ def process_postback_event(event):
         line_bot_api.reply_message(
             event.reply_token,
             TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
+        )
+    elif event.postback.data.find("Photo") > 1:
+        ## 點擊後，切換至照片相簿選擇
+        cameraRollQRB = QuickReplyButton(
+            action=CameraRollAction(label="選擇照片")
+        )
+
+        quickReplyList = QuickReply(
+            items=[cameraRollQRB]
+        )
+
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='拍照上傳', quick_reply=quickReplyList)
+        )
+    elif event.postback.data.find("Camera") > 1:
+        ## CameraAction
+        cameraQuickReplyButton = QuickReplyButton(
+            action=CameraAction(label="拍照")
+        )
+        quickReplyList = QuickReply(
+            items=[cameraQuickReplyButton]
+        )
+
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='拍照上傳', quick_reply=quickReplyList)
         )
     else:
         result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
