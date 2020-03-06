@@ -7,6 +7,7 @@ import numpy as np
 import requests
 import urllib
 from io import BytesIO
+import random
 
 path1 = os.getcwd()
 print(path1)
@@ -154,9 +155,9 @@ def process_text_message(event):
     #print("message:", event.message)
     #print("type:", event.message.type)
     # 取出消息內User的資料
-    #user_profile = line_bot_api.get_profile(event.source.user_id)
+    user_profile = line_bot_api.get_profile(event.source.user_id)
     #print("user_profile:", user_profile)
-    #userName = dict(user_profile)["displayName"]
+    userName = json.loads(json.dumps(vars(user_profile),sort_keys=True))["display_name"]
     # 讀取圖片檔做影像辨視
     if event.message.type == "image":
         message_content = line_bot_api.get_message_content(event.message.id)
@@ -186,29 +187,29 @@ def process_text_message(event):
                 result_message_array
             )
         elif event.message.text in util.getSiteList():
-            prod = util.getProducer()
-            # 步驟3. 指定想要發佈訊息的topic名稱
-            topicName = 'test1'
-            util.sendKafkaMsg(topicName, event.message.text, event.reply_token)
+            # prod = util.getProducer()
+            # # 步驟3. 指定想要發佈訊息的topic名稱
+            # topicName = 'test1'
+            #util.sendKafkaMsg(topicName, event.message.text, event.reply_token)
 
-            re = util.getRedis()
-            tnow = datetime.datetime.now()
-
-            value = re.get(event.reply_token)
-            try:
-                while value == None:
-                    value = re.get(event.reply_token)
-
-                    diff = (datetime.datetime.now() - tnow).total_seconds()
-                    print("seconds:", diff)
-                    assert diff < 30, "over time error"
-            except AssertionError as error:
-                print(error)
-                return
-
-            print(value)
-
-            siteList = value.split(",")
+            # re = util.getRedis()
+            # tnow = datetime.datetime.now()
+            #
+            # value = re.get(event.reply_token)
+            # try:
+            #     while value == None:
+            #         value = re.get(event.reply_token)
+            #
+            #         diff = (datetime.datetime.now() - tnow).total_seconds()
+            #         print("seconds:", diff)
+            #         assert diff < 30, "over time error"
+            # except AssertionError as error:
+            #     print(error)
+            #     return
+            #
+            # print(value)
+            value = ["金瓜石, 正濱漁港, 阿根納遺址, 龍磐步道", "小人國主題樂園,慈湖陵寢,石門水壩,小烏來天空步道", "龜山島,太平山國家森林遊樂區,羅東夜市,冬山河親水公園"]
+            siteList = value[random.randint(0,3)].split(",")
             print("siteList:", siteList)
             replyMsg = util.getTemplateJson();
             for i, site in enumerate(siteList):
@@ -219,6 +220,13 @@ def process_text_message(event):
                 event.reply_token,
                 TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
             )
+
+            elkDoc = {}
+            elkDoc["UserName"] = userName
+            elkDoc["Place"] = event.message.text
+            elkDoc["Recommedation"] = siteList
+            elkDoc["DateTime"] = datetime.datetime.now()
+            util.insertELK("rsite", elkDoc)
         else:
             return
             # line_bot_api.reply_message(
@@ -244,48 +252,12 @@ from linebot.models import (
 def process_postback_event(event):
     result_message_array = []
     replyJsonPath = r"./static/material/{0}/reply.json".format(event.postback.data)
-    print("replyJsonPath:", replyJsonPath)
-    print("answer:", event.postback.data.find(":::Q"))
+    #print("replyJsonPath:", replyJsonPath)
+    #print("answer:", event.postback.data.find(":::Q"))
     user_profile = line_bot_api.get_profile(event.source.user_id)
-    print("user_profile:", type(json.dumps(vars(user_profile),sort_keys=True)))
+    #print("user_profile:", type(json.dumps(vars(user_profile),sort_keys=True)))
     userName = json.loads(json.dumps(vars(user_profile),sort_keys=True))["display_name"]
 
-    #if event.postback.data == "question":
-        # result_message_array = getQuestionnaireReply(event.reply_token, replyJsonPath)
-        #
-        # line_bot_api.reply_message(
-        #     event.reply_token,
-        #     result_message_array
-        # )
-        #
-        # re = util.getRedis()
-        # tnow = datetime.datetime.now()
-        #
-        # value = re.get(event.reply_token)
-        # try:
-        #     while value == None:
-        #         value = re.get(event.reply_token)
-        #
-        #         diff = (datetime.datetime.now() - tnow).total_seconds()
-        #         print("seconds:", diff)
-        #         assert diff < 30, "over time error"
-        # except AssertionError as error:
-        #     print(error)
-        #     return
-        #
-        # print(value)
-        #
-        # siteList = value.split(",")
-        # print("siteList:", siteList)
-        # replyMsg = util.getTemplateJson()
-        # for i, site in enumerate(siteList):
-        #     replyMsg = replyMsg.replace("site{}".format(i + 1), site)
-        #
-        # print("replyMsg:", replyMsg)
-        # line_bot_api.reply_message(
-        #     event.reply_token,
-        #     TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
-        # )
     if event.postback.data == "question":
         replyJsonPath = r"./static/material/Question1/reply.json"
         result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
@@ -308,8 +280,20 @@ def process_postback_event(event):
             doc = {}
             score = 0
             for an in allAnswer:
-                doc[an] = score + 1
+                score += 1
+                doc[an] = score
             util.sendKafkaMsg("questionaire", doc, event.reply_token)
+
+            elkDoc = {}
+            elkDoc["key"] = key
+            elkDoc["UserName"] = userName
+            elkDoc["DateTime"] = datetime.datetime.now()
+            for i, an in enumerate(allAnswer):
+                elkDoc["item{0}".format(i+1)] = an
+
+            util.insertELK("questionaire", elkDoc)
+            #把redis資料清空
+            util.redisLPopAll(key)
         else:
             timestamp = datetime.datetime.now().strftime("%Y%m%d")
             answer = event.postback.data[9:]
