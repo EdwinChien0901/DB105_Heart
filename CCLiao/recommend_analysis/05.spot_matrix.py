@@ -7,6 +7,7 @@ def list_strip(ori_list):
     ori_list = list(filter(None, ori_list))
     return ori_list
 
+# 計算餘弦相似性，輸入兩個等長且為數字的list，回傳一個float，若是兩個數字皆為0時則不予計算
 def similar(aa, bb):
 	if sum(aa) * sum(bb):
 		up = 0
@@ -62,19 +63,22 @@ spot_relation_df = pd.read_csv('spot_list.csv',header = None)
 spot_relation_df.columns = ['spot']
 
 for spot in spot_relation_df['spot']:
-	spot_relation_df[spot] = ''
-
+	spot_relation_df[spot] = 0
 # print(spot_relation_df)
 
-
+# 基於餘弦相似性公式計算每2個景點之間的關聯性
 for j in range(len(spot_relation_df['spot'])):
+	print(j)
 	for k in range(len(spot_relation_df['spot'])):
 		if j != k:
 			aa = weight_df.loc[j,:].values.tolist()[1:]
 			bb = weight_df.loc[k,:].values.tolist()[1:]
 			spot_relation_df.iloc[j, k+1] = similar(aa,bb)
-	print(j)
 	spot_relation_df.info(memory_usage="deep")
-
+# 將矩陣的對角線填入-1以和0做區隔
+for j in range(len(spot_relation_df['spot'])):
+	for k in range(len(spot_relation_df['spot'])):
+		if j == k:
+			spot_relation_df.iloc[j, k+1] = -1
 spot_relation_df.to_csv('spot_matrix.csv',index=False)
 
