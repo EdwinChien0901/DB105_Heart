@@ -10,4 +10,5 @@ line-bot-sdk
 redis
 confluent_kafka
 elasticsearch
+opencv-python
 gunicorn

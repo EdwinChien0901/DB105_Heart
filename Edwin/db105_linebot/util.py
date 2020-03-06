@@ -111,3 +111,20 @@ def getRedisImg(lineToken):
 
     return os.path.abspath(fileName)
 
+def redisLPush(key, value):
+    r = getRedis(True)
+    r.lpush(key, value)
+
+def redisLRange(key, sidx, eidx):
+    r = getRedis(True)
+    lList = r.lrange(key, sidx, eidx)
+
+    return lList
+
+def redisLPopAll(key):
+    r = getRedis(True)
+    value = r.rpop(key)
+
+    while value != None:
+        value = r.rpop(key)
+

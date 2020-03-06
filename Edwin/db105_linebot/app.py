@@ -153,6 +153,10 @@ from linebot.models import (
 def process_text_message(event):
     #print("message:", event.message)
     #print("type:", event.message.type)
+    # 取出消息內User的資料
+    #user_profile = line_bot_api.get_profile(event.source.user_id)
+    #print("user_profile:", user_profile)
+    #userName = dict(user_profile)["displayName"]
     # 讀取圖片檔做影像辨視
     if event.message.type == "image":
         message_content = line_bot_api.get_message_content(event.message.id)
@@ -241,43 +245,82 @@ def process_postback_event(event):
     result_message_array = []
     replyJsonPath = r"./static/material/{0}/reply.json".format(event.postback.data)
     print("replyJsonPath:", replyJsonPath)
+    print("answer:", event.postback.data.find(":::Q"))
+    user_profile = line_bot_api.get_profile(event.source.user_id)
+    print("user_profile:", type(json.dumps(vars(user_profile),sort_keys=True)))
+    userName = json.loads(json.dumps(vars(user_profile),sort_keys=True))["display_name"]
 
+    #if event.postback.data == "question":
+        # result_message_array = getQuestionnaireReply(event.reply_token, replyJsonPath)
+        #
+        # line_bot_api.reply_message(
+        #     event.reply_token,
+        #     result_message_array
+        # )
+        #
+        # re = util.getRedis()
+        # tnow = datetime.datetime.now()
+        #
+        # value = re.get(event.reply_token)
+        # try:
+        #     while value == None:
+        #         value = re.get(event.reply_token)
+        #
+        #         diff = (datetime.datetime.now() - tnow).total_seconds()
+        #         print("seconds:", diff)
+        #         assert diff < 30, "over time error"
+        # except AssertionError as error:
+        #     print(error)
+        #     return
+        #
+        # print(value)
+        #
+        # siteList = value.split(",")
+        # print("siteList:", siteList)
+        # replyMsg = util.getTemplateJson()
+        # for i, site in enumerate(siteList):
+        #     replyMsg = replyMsg.replace("site{}".format(i + 1), site)
+        #
+        # print("replyMsg:", replyMsg)
+        # line_bot_api.reply_message(
+        #     event.reply_token,
+        #     TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
+        # )
     if event.postback.data == "question":
-        result_message_array = getQuestionnaireReply(event.reply_token, replyJsonPath)
-
+        replyJsonPath = r"./static/material/Question1/reply.json"
+        result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
         line_bot_api.reply_message(
             event.reply_token,
             result_message_array
         )
+    elif event.postback.data.find(":::Q") >= 1:
+        idx = event.postback.data[5:6]
+        print("idx:", idx)
+        if idx == "5":
+            print("return result")
+            timestamp = datetime.datetime.now().strftime("%Y%m%d")
+            answer = event.postback.data[9:]
+            key = "{0}-{1}".format(userName, timestamp)
+            util.redisLPush(key, answer)
 
-        re = util.getRedis()
-        tnow = datetime.datetime.now()
+            allAnswer = util.redisLRange(key, 0, -1)
+            print("allAnswer:", allAnswer)
+            doc = {}
+            score = 0
+            for an in allAnswer:
+                doc[an] = score + 1
+            util.sendKafkaMsg("questionaire", doc, event.reply_token)
+        else:
+            timestamp = datetime.datetime.now().strftime("%Y%m%d")
+            answer = event.postback.data[9:]
+            util.redisLPush("{0}-{1}".format(userName, timestamp), answer)
 
-        value = re.get(event.reply_token)
-        try:
-            while value == None:
-                value = re.get(event.reply_token)
-
-                diff = (datetime.datetime.now() - tnow).total_seconds()
-                print("seconds:", diff)
-                assert diff < 30, "over time error"
-        except AssertionError as error:
-            print(error)
-            return
-
-        print(value)
-
-        siteList = value.split(",")
-        print("siteList:", siteList)
-        replyMsg = util.getTemplateJson()
-        for i, site in enumerate(siteList):
-            replyMsg = replyMsg.replace("site{}".format(i + 1), site)
-
-        print("replyMsg:", replyMsg)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
-        )
+            replyJsonPath = r"./static/material/Question{0}/reply.json".format(int(idx) + 1)
+            result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
+            line_bot_api.reply_message(
+                event.reply_token,
+                result_message_array
+            )
     elif event.postback.data.find("Photo") > 1:
         ## 點擊後，切換至照片相簿選擇
         cameraRollQRB = QuickReplyButton(
@@ -290,7 +333,7 @@ def process_postback_event(event):
 
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text='拍照上傳', quick_reply=quickReplyList)
+            TextSendMessage(text='選擇照片', quick_reply=quickReplyList)
         )
     elif event.postback.data.find("Camera") > 1:
         ## CameraAction
@@ -311,7 +354,6 @@ def process_postback_event(event):
             event.reply_token,
             result_message_array
         )
-
 
 
 if __name__ == "__main__":
