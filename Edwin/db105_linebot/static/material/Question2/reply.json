@@ -1,0 +1,38 @@
+[
+  {
+  "type": "template",
+  "altText": "this is a buttons template",
+  "template": {
+    "type": "buttons",
+    "actions": [
+      {
+        "type": "postback",
+        "label": "雨天備案",
+        "text": "你喜歡室內的旅程!!!",
+        "data": "[:::Q2-1]inner"
+      },
+      {
+        "type": "postback",
+        "label": "戶外玩樂",
+        "text": "你喜歡戶外玩樂的旅程!!!",
+        "data": "[:::Q2-2]outdoor"
+      },
+      {
+        "type": "postback",
+        "label": "半戶外方案",
+        "text": "你喜歡半戶外的旅程!!!",
+        "data": "[:::Q2-3]outdoor2"
+      },
+      {
+        "type": "postback",
+        "label": "崇尚自然",
+        "text": "你喜歡大自然的旅程!!!",
+        "data": "[:::Q2-4]natural"
+      }
+    ],
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKdSABbl3nQ6Jttqlf_7DuVZXV9hz3KVISpqFsY7zf73TYh6ZE",
+    "title": "您喜歡偏向室內or戶外的旅程!!!",
+    "text": "-"
+  }
+}
+]

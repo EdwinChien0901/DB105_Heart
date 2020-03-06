@@ -1,0 +1,38 @@
+[
+  {
+  "type": "template",
+  "altText": "this is a buttons template",
+  "template": {
+    "type": "buttons",
+    "actions": [
+      {
+        "type": "postback",
+        "label": "雙北",
+        "text": "你想去新北、台北",
+        "data": "[:::Q1-1]Taipei"
+      },
+      {
+        "type": "postback",
+        "label": "基隆",
+        "text": "你想去基隆",
+        "data": "[:::Q1-2]Keelung"
+      },
+      {
+        "type": "postback",
+        "label": "宜蘭",
+        "text": "你想去宜蘭",
+        "data": "[:::Q1-3]ILan"
+      },
+      {
+        "type": "postback",
+        "label": "桃園",
+        "text": "你想去桃園",
+        "data": "[:::Q1-4]Taoyaung"
+      }
+    ],
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv1fMLTdWkPX1v881nrllXtJFJb_bYC6MTilfM6El7f39Bc3a0",
+    "title": "最近我想去這裡玩!!!",
+    "text": "-"
+  }
+}
+]
