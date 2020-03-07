@@ -11,4 +11,6 @@ redis
 confluent_kafka
 elasticsearch
 opencv-python
+mysqlclient
+pymongo
 gunicorn

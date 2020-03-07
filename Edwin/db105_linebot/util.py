@@ -3,6 +3,8 @@ import redis
 from elasticsearch import Elasticsearch
 import numpy as np
 import os, cv2
+import MySQLdb
+import pymongo
 
 siteList = ["基隆","台北","宜蘭","桃園", "台北101", "國立故宮博物院", "九份", "中正紀念堂", "陽明山國家公園", "龍山寺",
             "野柳", "十分瀑布", "象山", "臺北市立動物園", "國立國父紀念館", "北投溫泉博物館", "饒河街觀光夜市",
@@ -58,6 +60,17 @@ useMenuJson = """
 def error_cb(err):
     print('Error: %s' % err)
 
+#Get Connections
+def getMongoDB():
+    myclient = pymongo.MongoClient("mongodb://35.194.224.128:27017")
+
+    return myclient
+
+def getMsSQLConn():
+    db = MySQLdb.connect(host='35.194.224.128', user='db105adm', passwd='db105heart', db='db105_heart', port=3306, charset='utf8')
+
+    return db
+
 def getProducer():
     # 步驟1. 設定要連線到Kafka集群的相關設定
     props = {
@@ -75,41 +88,31 @@ def getRedis(isDecode):
     #r = redis.Redis(host="192.168.11.129", port=6379, decode_responses=isDecode)
     return r
 
-def getTemplateJson():
-    return templateJson
 
-def getSiteList():
-    return siteList
-
-def sendKafkaMsg(topicName, value, token):
-    prod = getProducer()
-    value = {}
-    value["key"] = token
-    value["value"] = value
-
-    prod.produce(topicName, value=str(value), key=token)
-    prod.flush()
-
-def getUseMenuJson():
-    return useMenuJson
-
-
-def insertELK(idx, doc):
-    #es = Elasticsearch('http://192.168.11.129:9200')
-    es = Elasticsearch('http://35.194.224.128:9200')
-    res = es.index(index=idx, doc_type='elk', body=doc)
-
+#Redis Operation
 def setRedisImg(lineToken, imgByte):
     r = getRedis(True)
-    r.set(lineToken, imgByte)
+    try:
+        r.set(lineToken, imgByte)
+    except Exception as e:
+        print("error:", e)
+    finally:
+        r.close()
 
 def getRedisImg(lineToken):
     r = getRedis(False)
-    img1_bytes_ = r.get(lineToken)
-    print(img1_bytes_)
-    decoded = cv2.imdecode(np.frombuffer(img1_bytes_, np.uint8), 1)
-    fileName = "./{0}.jpg".format(lineToken)
-    cv2.imwrite(fileName.format(), decoded)
+    fileName = ""
+
+    try:
+        img1_bytes_ = r.get(lineToken)
+        print(img1_bytes_)
+        decoded = cv2.imdecode(np.frombuffer(img1_bytes_, np.uint8), 1)
+        fileName = "./{0}.jpg".format(lineToken)
+        cv2.imwrite(fileName.format(), decoded)
+    except Exception as e:
+        print("error:", e)
+    finally:
+        r.close()
 
     return os.path.abspath(fileName)
 
@@ -129,4 +132,95 @@ def redisLPopAll(key):
 
     while value != None:
         value = r.rpop(key)
+
+#MongoDB Operation
+def findMongoDataURL(dbName, colName, siteName):
+    #db.gina_scrapy.find({tags : "台北"})
+    #db.gina_scrapy.find({tags : "基隆"}, {_id:0,tags:1, url:1, title:1}).limit(5)
+    #db.BackPacker.createIndex({content : "text"})})
+    #db.BackPacker.find({ $text : { $search : "基隆" }})
+
+    monCli = getMongoDB()
+    urlList = []
+    try:
+        mydb = monCli[dbName]
+        mycol = mydb[colName]
+        rd = mycol.find({"$text" : { "$search" : siteName }}).limit(5)
+
+        for er in rd:
+            doc = dict(er)
+            urlList.append(doc["url"])
+    except Exception as e:
+        print("error:", e)
+    finally:
+        monCli.close()
+
+    return urlList
+
+#MySQL Operation
+def getSiteList():
+    sqlConn = getMsSQLConn()
+
+    try:
+        cursor = sqlConn.cursor()
+        sql_str = 'select * from product'
+        cursor.execute(sql_str)
+        datarows = cursor.fetchall()
+        siteList.clear()
+        for row in datarows:
+            #print(row[2])
+            siteList.append(row[2])
+
+    except Exception as e:
+        print("error:", e)
+    finally:
+        sqlConn.close()
+
+    return siteList
+
+def insertUserInfo(userDoc):
+    sqlConn = getMsSQLConn()
+
+    try:
+      sqlStr = """insert into db105_heart.users (user_name, picture_url, status_message, user_id, datetime) 
+                  values ('{0}', '{1}', '{2}', '{3}', now())"""
+      sqlStr = sqlStr.format(userDoc["display_name"], userDoc["picture_url"], userDoc["status_message"], userDoc["user_id"])
+      #print("sqlStr:", sqlStr)
+      cursor = sqlConn.cursor()
+      cursor.execute(sqlStr)
+      sqlConn.commit()
+    except Exception as e:
+        print("error:", e)
+    finally:
+        sqlConn.close()
+
+#Kafka Operation
+def sendKafkaMsg(topicName, value, token):
+    prod = getProducer()
+    value = {}
+    value["key"] = token
+    value["value"] = value
+
+    prod.produce(topicName, value=str(value), key=token)
+    prod.flush()
+
+#ELK Operation
+def insertELK(idx, doc):
+    #es = Elasticsearch('http://192.168.11.129:9200')
+    es = Elasticsearch('http://35.194.224.128:9200')
+    res = es.index(index=idx, doc_type='elk', body=doc)
+
+#Other Operations
+def getTemplateJson():
+    return templateJson
+
+def getUseMenuJson():
+    return useMenuJson
+
+
+if __name__ == "__main__":
+    #list = getSiteList()
+    #print(list)
+    list = findMongoDataURL("python_heart", "BackPacker", "基隆 勸濟堂")
+    print(list)
 

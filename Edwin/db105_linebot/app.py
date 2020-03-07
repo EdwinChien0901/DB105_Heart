@@ -132,7 +132,11 @@ from linebot.models import (
 # 關注事件處理
 @handler.add(FollowEvent)
 def process_follow_event(event):
-    # 讀取並轉換
+    #註冊follower
+    user_profile = line_bot_api.get_profile(event.source.user_id)
+    # print("user_profile:", user_profile)
+    util.insertUserInfo(json.loads(json.dumps(vars(user_profile), sort_keys=True)))
+    #傳送訊息
     result_message_array = []
     replyJsonPath = r"./static/material/follow/reply.json"
     result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
