@@ -1,11 +1,13 @@
 from kafka import KafkaConsumer
 from pyspark import SparkContext
 from pyspark.sql import SQLContext
+import mysqltest
+import pandas_main
 
 #kafka consumer
-consumer = KafkaConsumer('my_favorite_topic')
-for msg in consumer:
-    print(msg)
+# consumer = KafkaConsumer('my_favorite_topic')
+# for msg in consumer:
+#     print(msg)
 
 #mysql
 #SparkContext(master=None, appName=None, sparkHome=None, pyFiles=None, environment=None, batchSize=0, serializer=PickleSerializer(), conf=None, gateway=None, jsc=None, profiler_cls=<class 'pyspark.profiler.BasicProfiler'>)
