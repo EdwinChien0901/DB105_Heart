@@ -34,9 +34,9 @@ secretFileContentJson=json.load(open(r"./static/line_secret_key",'r',encoding='u
 # 設定Server啟用細節
 app = Flask(__name__,static_url_path = "/material" , static_folder = r"./static/material/")
 
-print("token:", secretFileContentJson.get("channel_access_token"))
-print("key:", secretFileContentJson.get("secret_key"))
-print("server:", secretFileContentJson.get("server_url"))
+#("token:", secretFileContentJson.get("channel_access_token"))
+#print("key:", secretFileContentJson.get("secret_key"))
+#print("server:", secretFileContentJson.get("server_url"))
 # 生成實體物件
 line_bot_api = LineBotApi(secretFileContentJson.get("channel_access_token"))
 handler = WebhookHandler(secretFileContentJson.get("secret_key"))
@@ -114,7 +114,7 @@ def getQuestionnaireReply(reToken, fileName):
         jsonStr = fi.read()
         jsonStr = jsonStr.replace("{url}", "{0}?linebottoken={1}".format(ques_url, reToken))
         ##jsonStr = fi.read().replace("{url}", "{0}?linebottoken={1}".format(ques_url, reToken))
-        print("jsonStr:", jsonStr)
+        #("jsonStr:", jsonStr)
         jsonArray = json.loads(jsonStr)
 
     # 解析json
@@ -135,7 +135,10 @@ def process_follow_event(event):
     #註冊follower
     user_profile = line_bot_api.get_profile(event.source.user_id)
     # print("user_profile:", user_profile)
-    util.insertUserInfo(json.loads(json.dumps(vars(user_profile), sort_keys=True)))
+    #util.insertUserInfo(json.loads(json.dumps(vars(user_profile), sort_keys=True)))
+    #util.sendKafkaMsg("followUser", json.loads(json.dumps(vars(user_profile), sort_keys=True)), event.reply_token)
+    #util.sendKafkaMsg("followUser", user_profile, event.reply_token)
+    util.sendKafkaMsg("ftest", user_profile, event.reply_token)
     #傳送訊息
     result_message_array = []
     replyJsonPath = r"./static/material/follow/reply.json"
@@ -214,12 +217,12 @@ def process_text_message(event):
             # print(value)
             value = ["金瓜石, 正濱漁港, 阿根納遺址, 龍磐步道", "小人國主題樂園,慈湖陵寢,石門水壩,小烏來天空步道", "龜山島,太平山國家森林遊樂區,羅東夜市,冬山河親水公園"]
             siteList = value[random.randint(0,3)].split(",")
-            print("siteList:", siteList)
+            #print("siteList:", siteList)
             replyMsg = util.getTemplateJson();
             for i, site in enumerate(siteList):
                 replyMsg = replyMsg.replace("site{}".format(i + 1), site)
 
-            print("replyMsg:", replyMsg)
+            #print("replyMsg:", replyMsg)
             line_bot_api.reply_message(
                 event.reply_token,
                 TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
@@ -271,16 +274,16 @@ def process_postback_event(event):
         )
     elif event.postback.data.find(":::Q") >= 1:
         idx = event.postback.data[5:6]
-        print("idx:", idx)
+        #print("idx:", idx)
         if idx == "5":
-            print("return result")
+            #print("return result")
             timestamp = datetime.datetime.now().strftime("%Y%m%d")
             answer = event.postback.data[9:]
             key = "{0}-{1}".format(userName, timestamp)
             util.redisLPush(key, answer)
 
             allAnswer = util.redisLRange(key, 0, -1)
-            print("allAnswer:", allAnswer)
+            #print("allAnswer:", allAnswer)
             doc = {}
             score = 0
             for an in allAnswer:
@@ -309,6 +312,29 @@ def process_postback_event(event):
                 event.reply_token,
                 result_message_array
             )
+    elif event.postback.data.find(":::R") >= 1:
+        areaList = ["臺北市", "新北市","基隆市","宜蘭縣","桃園市"]
+        idx = int(event.postback.data[5:6])
+        #print("idx:", idx)
+        siteList = util.getSiteListByArea(areaList[idx])
+        urlList = util.getUrlList()
+        randomlist = random.sample([x for x in range(len(siteList))], 5)
+        # print("randomlist:", randomlist)
+        replyJsonPath = r"./static/material/recommedation/reply.json"
+        with open(replyJsonPath, 'r', encoding="utf-8") as f:
+            replyMsg = f.read()
+
+        # print("replyMsg:", replyMsg)
+        for i, r in enumerate(randomlist):
+            replyMsg = replyMsg.replace("site{}".format(i + 1), siteList[r])
+            replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[r])
+
+        # print("replyMsg:", replyMsg)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
+        )
+
     elif event.postback.data.find("Photo") > 1:
         ## 點擊後，切換至照片相簿選擇
         cameraRollQRB = QuickReplyButton(
@@ -335,6 +361,24 @@ def process_postback_event(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='拍照上傳', quick_reply=quickReplyList)
+        )
+    elif  event.postback.data == "recommedation":
+        siteList = util.getSiteList()
+        urlList = util.getUrlList()
+        randomlist = random.sample([x for x in range(1000)], 5)
+        #print("randomlist:", randomlist)
+        with open(replyJsonPath, 'r', encoding="utf-8") as f:
+            replyMsg = f.read()
+
+        #print("replyMsg:", replyMsg)
+        for i, r in enumerate(randomlist):
+            replyMsg = replyMsg.replace("site{}".format(i + 1), siteList[r])
+            replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[r])
+
+        #print("replyMsg:", replyMsg)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
         )
     else:
         result_message_array = detect_json_array_to_new_message_array(replyJsonPath)

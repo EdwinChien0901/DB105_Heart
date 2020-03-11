@@ -9,6 +9,7 @@ import pymongo
 siteList = ["基隆","台北","宜蘭","桃園", "台北101", "國立故宮博物院", "九份", "中正紀念堂", "陽明山國家公園", "龍山寺",
             "野柳", "十分瀑布", "象山", "臺北市立動物園", "國立國父紀念館", "北投溫泉博物館", "饒河街觀光夜市",
             "金瓜石", "十分老街", "淡水漁人碼頭", "貓空", "松山文創園區", "國民革命忠烈祠", "淡水紅毛城", "地熱谷", "龜山島"]
+urlList = []
 
 templateJson = """
 {
@@ -84,7 +85,7 @@ def getProducer():
     return producer
 
 def getRedis(isDecode):
-    r = redis.Redis(host="34.85.107.158", port=6379, decode_responses=isDecode)
+    r = redis.Redis(host="35.194.224.128", port=6379, decode_responses=isDecode)
     #r = redis.Redis(host="192.168.11.129", port=6379, decode_responses=isDecode)
     return r
 
@@ -163,13 +164,38 @@ def getSiteList():
 
     try:
         cursor = sqlConn.cursor()
-        sql_str = 'select * from product'
+        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area'
         cursor.execute(sql_str)
         datarows = cursor.fetchall()
         siteList.clear()
         for row in datarows:
             #print(row[2])
-            siteList.append(row[2])
+            urlList.append(row[0])
+            siteList.append(row[1])
+
+    except Exception as e:
+        print("error:", e)
+    finally:
+        sqlConn.close()
+
+    return siteList
+
+def getUrlList():
+    return urlList
+
+def getSiteListByArea(area):
+    sqlConn = getMsSQLConn()
+
+    try:
+        cursor = sqlConn.cursor()
+        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area where area = \'{0}\''.format(area)
+        cursor.execute(sql_str)
+        datarows = cursor.fetchall()
+        siteList.clear()
+        for row in datarows:
+            #print(row[2])
+            urlList.append(row[0])
+            siteList.append(row[1])
 
     except Exception as e:
         print("error:", e)
@@ -184,7 +210,7 @@ def insertUserInfo(userDoc):
     try:
       sqlStr = """insert into db105_heart.users (user_name, picture_url, status_message, user_id, datetime) 
                   values ('{0}', '{1}', '{2}', '{3}', now())"""
-      sqlStr = sqlStr.format(userDoc["display_name"], userDoc["picture_url"], userDoc["status_message"], userDoc["user_id"])
+      sqlStr = sqlStr.format(userDoc["displayName"], userDoc["pictureUrl"], userDoc["statusMessage"], userDoc["userId"])
       #print("sqlStr:", sqlStr)
       cursor = sqlConn.cursor()
       cursor.execute(sqlStr)
@@ -197,9 +223,9 @@ def insertUserInfo(userDoc):
 #Kafka Operation
 def sendKafkaMsg(topicName, value, token):
     prod = getProducer()
-    value = {}
-    value["key"] = token
-    value["value"] = value
+    #value = {}
+    #value["key"] = token
+    #value["value"] = value
 
     prod.produce(topicName, value=str(value), key=token)
     prod.flush()
