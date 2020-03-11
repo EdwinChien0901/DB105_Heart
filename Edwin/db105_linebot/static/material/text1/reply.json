@@ -8,30 +8,30 @@
       {
         "type": "postback",
         "label": "雙北",
-        "text": "你想去新北、台北",
-        "data": "新北、台北"
+        "text": "想去新北、台北",
+        "data": "[:::R1]Taipei"
       },
       {
         "type": "postback",
         "label": "基隆",
-        "text": "你想去基隆",
-        "data": "基隆"
+        "text": "想去基隆",
+        "data": "[:::R2]Keelung"
       },
       {
         "type": "postback",
         "label": "宜蘭",
-        "text": "你想去宜蘭",
-        "data": "宜蘭"
+        "text": "想去宜蘭",
+        "data": "[:::R3]ILan"
       },
       {
         "type": "postback",
         "label": "桃園",
-        "text": "你想去桃園",
-        "data": "桃園"
+        "text": "想去桃園",
+        "data": "[:::R4]Taoyaung"
       }
     ],
-    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv1fMLTdWkPX1v881nrllXtJFJb_bYC6MTilfM6El7f39Bc3a0",
-    "title": "最近我想去這裡玩!!!",
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSExPuJ7GoD1pfE_QxVCzXRYSnjH8H7n1l_Utr126kxH0WpZvZj",
+    "title": "您還可以來這些地方玩！",
     "text": "-"
   }
 }
