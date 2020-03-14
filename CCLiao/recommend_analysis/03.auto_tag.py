@@ -7,11 +7,12 @@ def autoTag(article):
 	tag_df = pd.read_csv('tag_list.csv', header=0)
 	for i, text in enumerate(tag_df['text']):
 		if text.strip() in article:
-			if len(tt) > 0:
-				tt += ' '
-				tt += tag_df['tag'][i].strip()
-			else:
-				tt = tag_df['tag'][i].strip()
+			if tag_df['tag'][i].strip() not in tt:
+				if len(tt) > 0:
+					tt += ' '
+					tt += tag_df['tag'][i].strip()
+				else:
+					tt = tag_df['tag'][i].strip()
 	return tt
 
 if __name__ == '__main__':
