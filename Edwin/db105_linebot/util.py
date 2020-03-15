@@ -11,6 +11,10 @@ siteList = ["基隆","台北","宜蘭","桃園", "台北101", "國立故宮博�
             "金瓜石", "十分老街", "淡水漁人碼頭", "貓空", "松山文創園區", "國民革命忠烈祠", "淡水紅毛城", "地熱谷", "龜山島"]
 urlList = []
 
+answerMapping = [{"culture":"人文風格", "nature":"自然風格", "shopping":"購物觀光"},{"static":"動態", "halfstatic":"能動能靜", "dynamic":"動態"},
+                 {"family":"家人", "friend":"朋友", "lover":"情侶", "pet":"寵物"},{"inner":"雨天備案","outdoor":"戶外玩樂", "outdoor2":"半戶外方案", "natural":"崇尚自然"},
+                 {"Taipei":"雙北", "Keelung":"基隆", "ILan":"宜蘭", "Taoyaung":"桃園"}]
+
 templateJson = """
 {
   "type": "template",
@@ -164,7 +168,7 @@ def getSiteList():
 
     try:
         cursor = sqlConn.cursor()
-        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area'
+        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area_v2'
         cursor.execute(sql_str)
         datarows = cursor.fetchall()
         siteList.clear()
@@ -188,7 +192,7 @@ def getSiteListByArea(area):
 
     try:
         cursor = sqlConn.cursor()
-        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area where area = \'{0}\''.format(area)
+        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area_v2 where area = \'{0}\''.format(area)
         cursor.execute(sql_str)
         datarows = cursor.fetchall()
         siteList.clear()
@@ -243,10 +247,53 @@ def getTemplateJson():
 def getUseMenuJson():
     return useMenuJson
 
+def getMappingList():
+    return answerMapping
 
+import random, datetime
 if __name__ == "__main__":
+    user = ["Edwin", "Gunn Chiu", "WEN", "倚聲", "廖俊哲", "黃慧雅"]
+    # sqlConn = getMsSQLConn()
+    # areaList = []
+    # siteList = []
+    # try:
+    #     cursor = sqlConn.cursor()
+    #     sql_str = 'select area, place_name from db105_heart.north_place_google_api_area_v2'
+    #     cursor.execute(sql_str)
+    #     datarows = cursor.fetchall()
+    #     siteList.clear()
+    #     for row in datarows:
+    #         # print(row[2])
+    #         areaList.append(row[0])
+    #         siteList.append(row[1])
+    #
+    # except Exception as e:
+    #     print("error:", e)
+    # finally:
+    #     sqlConn.close()
+
+    areaList = ["臺北市", "新北市", "基隆市", "宜蘭縣", "桃園市"]
+    placeDic = {"新北市":["九份老街", "野柳地質公園", "淡水老街", "猴硐車站", "紅毛城", "鶯歌老街", "金瓜寮魚蕨步道", "朱銘美術館", "烏來風景區", "福隆海水浴場"],
+                "臺北市":["士林官邸", "饒河街觀光夜市", "北投圖書館", "國立故宮博物院", "中正紀念堂", "台北101", "軍艦岩親山步道", "陽明山夜景", "四四南村", "關渡碼頭", "士林觀光夜市"],
+                "基隆市":["和平島", "基隆廟口", "情人湖濱海大道（外木山濱海大道）", "阿根納造船廠", "白米甕砲台（荷蘭城）", "正濱漁港（懷舊碼頭）", "潮境公園", "劉銘傳隧道", "八斗子公園", "大武崙砲台"],
+                "桃園市":["小烏來天空步道", "石門水庫", "大溪老街", "拉拉山巨木群", "角板山行館", "東眼山森林遊樂區", "巴陵古道生態園區", "中原夜市", "小人國", "馬祖新村眷村文創園區"],
+                "宜蘭縣":["金車咖啡城堡", "外澳沙灘", "蘭陽博物館", "礁溪溫泉", "望龍埤", "福山植物園", "羅東夜市", "太平山森林遊樂區", "東澳灣‧粉鳥林漁港", "幾米主題廣場（幾米公園）"]}
+    count = 0
+    while count <= 1000:
+        idx = random.randint(0, 4)
+        elkDoc = {}
+        elkDoc["UserName"] = user[random.randint(0, 5)]
+        #elkDoc["Place"] = siteList[idx]
+        #elkDoc["Area"] = areaList[idx]
+        elkDoc["Place"] = placeDic[areaList[idx]][random.randint(0, 9)]
+        elkDoc["Area"] = areaList[idx]
+        elkDoc["DateTime"] = datetime.datetime.now()
+        insertELK("rsite2", elkDoc)
+        count += 1
+
+
     #list = getSiteList()
     #print(list)
-    list = findMongoDataURL("python_heart", "BackPacker", "基隆 勸濟堂")
-    print(list)
+    #list = findMongoDataURL("python_heart", "BackPacker", "基隆 勸濟堂")
+    #print(list)
 

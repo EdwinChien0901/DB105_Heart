@@ -1,0 +1,32 @@
+{
+  "type": "template",
+  "altText": "this is a buttons template",
+  "template": {
+    "type": "buttons",
+    "actions": [
+      {
+        "type": "uri",
+        "label": "site1",
+        "uri": "http://1"
+      },
+      {
+        "type": "uri",
+        "label": "site2",
+        "uri": "http://2"
+      },
+      {
+        "type": "uri",
+        "label": "site3",
+        "uri": "http://3"
+      },
+      {
+        "type": "uri",
+        "label": "site4",
+        "uri": "http://4"
+      }
+    ],
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJBqZ60tcWFH5TvZ9KU5DEj7WBllMqRWnuc-ZouaONUFj08G7q",
+    "title": "推薦 の熱門景點",
+    "text": "-"
+  }
+}

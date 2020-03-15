@@ -295,10 +295,11 @@ def process_postback_event(event):
             elkDoc["key"] = key
             elkDoc["UserName"] = userName
             elkDoc["DateTime"] = datetime.datetime.now()
+            mappingList = util.getMappingList()
             for i, an in enumerate(allAnswer):
-                elkDoc["item{0}".format(i+1)] = an
+                elkDoc["item{0}".format(i+1)] = mappingList[i][an]
 
-            util.insertELK("questionaire", elkDoc)
+            util.insertELK("questionaire-2", elkDoc)
             #把redis資料清空
             util.redisLPopAll(key)
         else:
