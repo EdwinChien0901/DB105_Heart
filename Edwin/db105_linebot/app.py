@@ -180,7 +180,36 @@ def process_text_message(event):
         util.setRedisImg(event.reply_token, img1_bytes)
 
         topicName = 'picsimilarity'
-        util.sendKafkaMsg(topicName, event.message.text, event.reply_token)
+        cityName = util.redisGetData("{0}-Photo".format(userName))
+        util.sendKafkaMsg(topicName, cityName, event.reply_token)
+
+        tnow = datetime.datetime.now()
+
+        isLock = util.redisGetData("{0}-pic".format(event.reply_token))
+        print("isLock:", isLock)
+        try:
+            while isLock == None:
+                # value = re.get(event.reply_token)
+                isLock = util.redisGetData("{0}-pic".format(event.reply_token))
+                diff = (datetime.datetime.now() - tnow).total_seconds()
+                #print("seconds:", diff)
+                assert diff < 30, "over time error"
+        except AssertionError as error:
+            print(error)
+            return
+
+        if isLock == "False":
+            replyJsonPath = r"./static/material/PicLock/reply.json"
+        else:
+            replyJsonPath = r"./static/material/PicUnLock/reply.json"
+
+        result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
+
+        # 發送
+        line_bot_api.reply_message(
+                event.reply_token,
+                result_message_array
+        )
         #file = util.getRedisImg(event.reply_token)
         #print("file:", file)
     else:
@@ -275,7 +304,7 @@ def process_postback_event(event):
     user_profile = line_bot_api.get_profile(event.source.user_id)
     #print("user_profile:", type(json.dumps(vars(user_profile),sort_keys=True)))
     userName = json.loads(json.dumps(vars(user_profile),sort_keys=True))["display_name"]
-
+    cityMapping = {"TPE":"雙北", "KL":"基隆市", "IL":"宜蘭縣", "TY":"桃園市"}
     if event.postback.data == "question":
         replyJsonPath = r"./static/material/Question1/reply.json"
         result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
@@ -361,10 +390,10 @@ def process_postback_event(event):
         quickReplyList = QuickReply(
             items=[cameraRollQRB]
         )
-        key = "{0}-{Photo}".format(userName)
+        key = "{0}-Photo".format(userName)
         util.redisDelKey(key)
-       
-        util.redisSetData(key, )
+        city = event.postback.data.split("_")[0]
+        util.redisSetData(key, cityMapping[city])
 
         line_bot_api.reply_message(
             event.reply_token,
@@ -378,6 +407,11 @@ def process_postback_event(event):
         quickReplyList = QuickReply(
             items=[cameraQuickReplyButton]
         )
+
+        key = "{0}-Photo".format(userName)
+        util.redisDelKey(key)
+        city = event.postback.data.split("_")[0]
+        util.redisSetData(key, cityMapping[city])
 
         line_bot_api.reply_message(
             event.reply_token,
