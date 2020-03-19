@@ -142,6 +142,18 @@ def redisLPopAll(key):
 
     while value != None:
         value = r.rpop(key)
+def redisDelKey(key):
+    r = getRedis(True)
+    if r.exists(key):
+        r.delete(key)
+
+def redisSetData(key, value):
+    r = getRedis(True)
+    r.set(key, value)
+
+def redisGetData(key):
+    r = getRedis(True)
+    return r.get(key)
 
 #MongoDB Operation
 def findMongoDataURL(dbName, colName, siteName):

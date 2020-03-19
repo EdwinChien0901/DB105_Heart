@@ -6,3 +6,5 @@ opencv-python
 mysqlclient
 pymongo
 pymysql
+keras
+tensorflow
