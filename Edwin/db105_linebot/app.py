@@ -179,7 +179,9 @@ def process_text_message(event):
         #print("token:", event.reply_token)
         util.setRedisImg(event.reply_token, img1_bytes)
 
-        file = util.getRedisImg(event.reply_token)
+        topicName = 'picsimilarity'
+        util.sendKafkaMsg(topicName, event.message.text, event.reply_token)
+        #file = util.getRedisImg(event.reply_token)
         #print("file:", file)
     else:
         #讀取文字訊息
@@ -194,33 +196,42 @@ def process_text_message(event):
                 result_message_array
             )
         elif event.message.text in util.getSiteList():
-            # prod = util.getProducer()
-            # # 步驟3. 指定想要發佈訊息的topic名稱
-            # topicName = 'test1'
-            #util.sendKafkaMsg(topicName, event.message.text, event.reply_token)
+            #prod = util.getProducer()
+            # 步驟3. 指定想要發佈訊息的topic名稱
+            topicName = 'recommendation'
+            util.sendKafkaMsg(topicName, event.message.text, event.reply_token)
 
-            # re = util.getRedis()
-            # tnow = datetime.datetime.now()
-            #
-            # value = re.get(event.reply_token)
-            # try:
-            #     while value == None:
-            #         value = re.get(event.reply_token)
-            #
-            #         diff = (datetime.datetime.now() - tnow).total_seconds()
-            #         print("seconds:", diff)
-            #         assert diff < 30, "over time error"
-            # except AssertionError as error:
-            #     print(error)
-            #     return
-            #
-            # print(value)
-            value = ["金瓜石, 正濱漁港, 阿根納遺址, 龍磐步道", "小人國主題樂園,慈湖陵寢,石門水壩,小烏來天空步道", "龜山島,太平山國家森林遊樂區,羅東夜市,冬山河親水公園"]
-            siteList = value[random.randint(0,3)].split(",")
+            #re = util.getRedis()
+            tnow = datetime.datetime.now()
+
+            siteList = util.redisLRange(event.reply_token, 0, -1)
+            print("siteList:", siteList)
+            try:
+                while len(siteList) < 4:
+                    #value = re.get(event.reply_token)
+                    siteList = util.redisLRange(event.reply_token, 0, -1)
+                    diff = (datetime.datetime.now() - tnow).total_seconds()
+                    print("seconds:", diff)
+                    assert diff < 30, "over time error"
+            except AssertionError as error:
+                print(error)
+                return
+
+            print(siteList)
+            #value = ["金瓜石, 正濱漁港, 阿根納遺址, 龍磐步道", "小人國主題樂園,慈湖陵寢,石門水壩,小烏來天空步道", "龜山島,太平山國家森林遊樂區,羅東夜市,冬山河親水公園"]
+            #siteList = value[random.randint(0,3)].split(",")
             #print("siteList:", siteList)
-            replyMsg = util.getTemplateJson();
-            for i, site in enumerate(siteList):
-                replyMsg = replyMsg.replace("site{}".format(i + 1), site)
+            #replyMsg = util.getTemplateJson();
+            replyJsonPath = r"./static/material/re-site/reply.json"
+            with open(replyJsonPath, 'r', encoding="utf-8") as f:
+                replyMsg = f.read()
+
+            sitesList = util.getSiteList()
+            urlList = util.getUrlList()
+
+            for i, r in enumerate(siteList):
+                replyMsg = replyMsg.replace("site{}".format(i + 1), r)
+                replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[sitesList.index(r)])
 
             #print("replyMsg:", replyMsg)
             line_bot_api.reply_message(
@@ -275,33 +286,38 @@ def process_postback_event(event):
     elif event.postback.data.find(":::Q") >= 1:
         idx = event.postback.data[5:6]
         #print("idx:", idx)
-        if idx == "5":
+        #if idx == "5":
+        if idx == "4":
             #print("return result")
             timestamp = datetime.datetime.now().strftime("%Y%m%d")
             answer = event.postback.data[9:]
             key = "{0}-{1}".format(userName, timestamp)
-            util.redisLPush(key, answer)
+            try:
+                util.redisLPush(key, answer)
 
-            allAnswer = util.redisLRange(key, 0, -1)
-            #print("allAnswer:", allAnswer)
-            doc = {}
-            score = 0
-            for an in allAnswer:
-                score += 1
-                doc[an] = score
-            util.sendKafkaMsg("questionaire", doc, event.reply_token)
+                allAnswer = util.redisLRange(key, 0, -1)
+                # print("allAnswer:", allAnswer)
+                doc = {}
+                score = 0
+                for an in allAnswer:
+                    score += 1
+                    doc[util.answerMapping[score - 1][an]] = score
+                util.sendKafkaMsg("questionaire", doc, key)
 
-            elkDoc = {}
-            elkDoc["key"] = key
-            elkDoc["UserName"] = userName
-            elkDoc["DateTime"] = datetime.datetime.now()
-            mappingList = util.getMappingList()
-            for i, an in enumerate(allAnswer):
-                elkDoc["item{0}".format(i+1)] = mappingList[i][an]
+                elkDoc = {}
+                elkDoc["key"] = key
+                elkDoc["UserName"] = userName
+                elkDoc["DateTime"] = datetime.datetime.now()
+                mappingList = util.getMappingList()
+                for i, an in enumerate(allAnswer):
+                    elkDoc["item{0}".format(i + 1)] = mappingList[i][an]
 
-            util.insertELK("questionaire-2", elkDoc)
-            #把redis資料清空
-            util.redisLPopAll(key)
+                util.insertELK("questionaire-2", elkDoc)
+            except Exception as e:
+                print(e)
+            finally:
+               #把redis資料清空
+               util.redisLPopAll(key)
         else:
             timestamp = datetime.datetime.now().strftime("%Y%m%d")
             answer = event.postback.data[9:]
@@ -345,6 +361,10 @@ def process_postback_event(event):
         quickReplyList = QuickReply(
             items=[cameraRollQRB]
         )
+        key = "{0}-{Photo}".format(userName)
+        util.redisDelKey(key)
+       
+        util.redisSetData(key, )
 
         line_bot_api.reply_message(
             event.reply_token,
@@ -366,21 +386,36 @@ def process_postback_event(event):
     elif  event.postback.data == "recommedation":
         siteList = util.getSiteList()
         urlList = util.getUrlList()
-        randomlist = random.sample([x for x in range(1000)], 5)
+        #randomlist = random.sample([x for x in range(1000)], 5)
         #print("randomlist:", randomlist)
         with open(replyJsonPath, 'r', encoding="utf-8") as f:
             replyMsg = f.read()
 
-        #print("replyMsg:", replyMsg)
-        for i, r in enumerate(randomlist):
-            replyMsg = replyMsg.replace("site{}".format(i + 1), siteList[r])
-            replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[r])
+        timestamp = datetime.datetime.now().strftime("%Y%m%d")
+        key = "{0}-{1}-re".format(userName, timestamp)
 
-        #print("replyMsg:", replyMsg)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
-        )
+        if util.getRedis(True).exists(key):
+            reSite = util.redisLRange(key, 0, -1)
+
+            # print("reSite:", reSite)
+            # for i, r in enumerate(randomlist):
+            for i, r in enumerate(reSite):
+                # replyMsg = replyMsg.replace("site{}".format(i + 1), siteList[r])
+                # replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[r])
+                replyMsg = replyMsg.replace("site{}".format(i + 1), r)
+                replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[siteList.index(r)])
+            # print("replyMsg:", replyMsg)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TemplateSendMessage.new_from_json_dict(json.loads(replyMsg))
+            )
+        else:
+            replyJsonPath = r"./static/material/Question1/reply.json"
+            result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
+            line_bot_api.reply_message(
+                event.reply_token,
+                result_message_array
+            )
     else:
         result_message_array = detect_json_array_to_new_message_array(replyJsonPath)
         line_bot_api.reply_message(

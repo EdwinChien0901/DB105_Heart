@@ -11,8 +11,13 @@ siteList = ["基隆","台北","宜蘭","桃園", "台北101", "國立故宮博�
             "金瓜石", "十分老街", "淡水漁人碼頭", "貓空", "松山文創園區", "國民革命忠烈祠", "淡水紅毛城", "地熱谷", "龜山島"]
 urlList = []
 
-answerMapping = [{"culture":"人文風格", "nature":"自然風格", "shopping":"購物觀光"},{"static":"動態", "halfstatic":"能動能靜", "dynamic":"動態"},
-                 {"family":"家人", "friend":"朋友", "lover":"情侶", "pet":"寵物"},{"inner":"雨天備案","outdoor":"戶外玩樂", "outdoor2":"半戶外方案", "natural":"崇尚自然"},
+#answerMapping = [{"culture":"人文風格", "nature":"自然風格", "shopping":"購物觀光"},{"static":"動態", "halfstatic":"能動能靜", "dynamic":"動態"},
+#                 {"family":"家人", "friend":"朋友", "lover":"情侶", "pet":"寵物"},{"inner":"雨天備案","outdoor":"戶外玩樂", "outdoor2":"半戶外方案", "natural":"崇尚自然"},
+#                 {"Taipei":"雙北", "Keelung":"基隆", "ILan":"宜蘭", "Taoyaung":"桃園"}]
+
+answerMapping = [{"culture":"人文風格", "nature":"自然風格", "shopping":"購物觀光"},
+                 {"family":"家人", "friend":"朋友", "lover":"情侶", "pet":"寵物"},
+                 {"inner":"雨天備案","outdoor":"戶外玩樂", "outdoor2":"半戶外方案", "natural":"崇尚自然"},
                  {"Taipei":"雙北", "Keelung":"基隆", "ILan":"宜蘭", "Taoyaung":"桃園"}]
 
 templateJson = """
@@ -138,6 +143,15 @@ def redisLPopAll(key):
     while value != None:
         value = r.rpop(key)
 
+def redisDelKey(key):
+    r = getRedis(True)
+    if r.exists(key):
+        r.delete(key)
+
+def redisSetData(key, value):
+    r = getRedis(True)
+    r.set(key, value)
+
 #MongoDB Operation
 def findMongoDataURL(dbName, colName, siteName):
     #db.gina_scrapy.find({tags : "台北"})
@@ -168,7 +182,7 @@ def getSiteList():
 
     try:
         cursor = sqlConn.cursor()
-        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area_v2'
+        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area_v4'
         cursor.execute(sql_str)
         datarows = cursor.fetchall()
         siteList.clear()
@@ -192,7 +206,7 @@ def getSiteListByArea(area):
 
     try:
         cursor = sqlConn.cursor()
-        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area_v2 where area = \'{0}\''.format(area)
+        sql_str = 'select url, place_name from db105_heart.north_place_google_api_area_v4 where area = \'{0}\''.format(area)
         cursor.execute(sql_str)
         datarows = cursor.fetchall()
         siteList.clear()
