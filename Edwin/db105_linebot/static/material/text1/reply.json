@@ -1,38 +1,6 @@
 [
   {
-  "type": "template",
-  "altText": "this is a buttons template",
-  "template": {
-    "type": "buttons",
-    "actions": [
-      {
-        "type": "postback",
-        "label": "雙北",
-        "text": "想去新北、台北",
-        "data": "[:::R1]Taipei"
-      },
-      {
-        "type": "postback",
-        "label": "基隆",
-        "text": "想去基隆",
-        "data": "[:::R2]Keelung"
-      },
-      {
-        "type": "postback",
-        "label": "宜蘭",
-        "text": "想去宜蘭",
-        "data": "[:::R3]ILan"
-      },
-      {
-        "type": "postback",
-        "label": "桃園",
-        "text": "想去桃園",
-        "data": "[:::R4]Taoyaung"
-      }
-    ],
-    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSExPuJ7GoD1pfE_QxVCzXRYSnjH8H7n1l_Utr126kxH0WpZvZj",
-    "title": "您還可以來這些地方玩！",
-    "text": "-"
-  }
+  "type": "text",
+  "text": "說個景點,還想去哪玩?!"
 }
 ]

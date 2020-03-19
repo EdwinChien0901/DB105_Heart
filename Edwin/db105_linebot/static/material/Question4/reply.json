@@ -7,25 +7,25 @@
     "actions": [
       {
         "type": "postback",
-        "label": "靜態",
-        "text": "您的旅程偏好靜態！",
-        "data": "[:::Q4-1]static"
+        "label": "人文風格",
+        "text": "你想走人文路線的旅行！",
+        "data": "[:::Q4-1]culture"
       },
       {
         "type": "postback",
-        "label": "能動能靜",
-        "text": "您的旅程偏好半靜半動！",
-        "data": "[:::Q4-2]halfstatic"
+        "label": "自然風格",
+        "text": "你想走自然風格的旅行！",
+        "data": "[:::Q4-2]nature"
       },
       {
         "type": "postback",
-        "label": "動態",
-        "text": "您的旅程偏好動態！",
-        "data": "[:::Q4-3]dynamic"
+        "label": "購物觀光",
+        "text": "你想走購物觀光格的旅行！",
+        "data": "[:::Q4-3]shopping"
       }
     ],
-    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz6N6wK8MxiRmHDuGMdZLHxsfg9M9BF-37zj2BoW3Qzkia4dr_",
-    "title": "您的旅程偏好 - 動態 or 靜態？",
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJR76mkhKa_kAhOeoUdq6rGjhxpPISR59yUPgh8Y4OCELmjVNq",
+    "title": "我想喜歡這種類型的旅行!!!",
     "text": "-"
   }
 }

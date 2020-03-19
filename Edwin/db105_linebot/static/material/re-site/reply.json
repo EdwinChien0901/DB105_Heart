@@ -1,0 +1,32 @@
+{
+  "type": "template",
+  "altText": "this is a buttons template",
+  "template": {
+    "type": "buttons",
+    "actions": [
+      {
+        "type": "uri",
+        "label": "site1",
+        "uri": "http://1"
+      },
+      {
+        "type": "uri",
+        "label": "site2",
+        "uri": "http://2"
+      },
+      {
+        "type": "uri",
+        "label": "site3",
+        "uri": "http://3"
+      },
+      {
+        "type": "uri",
+        "label": "site4",
+        "uri": "http://4"
+      }
+    ],
+    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSExPuJ7GoD1pfE_QxVCzXRYSnjH8H7n1l_Utr126kxH0WpZvZj",
+    "title": "您還可以來這些地方玩！",
+    "text": "-"
+  }
+}
