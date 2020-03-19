@@ -260,7 +260,12 @@ def process_text_message(event):
 
             for i, r in enumerate(siteList):
                 replyMsg = replyMsg.replace("site{}".format(i + 1), r)
-                replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[sitesList.index(r)])
+                try:
+                    replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[sitesList.index(r)])
+                except:
+                    print("recommendation:index out of range")
+
+
 
             #print("replyMsg:", replyMsg)
             line_bot_api.reply_message(
@@ -373,7 +378,10 @@ def process_postback_event(event):
         # print("replyMsg:", replyMsg)
         for i, r in enumerate(randomlist):
             replyMsg = replyMsg.replace("site{}".format(i + 1), siteList[r])
-            replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[r])
+            try:
+                replyMsg = replyMsg.replace("http://{}".format(i + 1), urlList[r])
+            except:
+                print("index out of range")
 
         # print("replyMsg:", replyMsg)
         line_bot_api.reply_message(
