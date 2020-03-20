@@ -1,34 +1,120 @@
-[
-  {
+{
   "type": "template",
-  "altText": "this is a buttons template",
+  "altText": "this is a carousel template",
   "template": {
-    "type": "buttons",
-    "actions": [
+    "type": "carousel",
+    "actions": [],
+    "columns": [
       {
-        "type": "message",
-        "label": "熱門景點 1",
-        "text": "動作 1"
+        "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI5QgTsnu9vTmz0H4jkrcL_NiRKuO9A4gkVMHY-ZeLAvIDG2Rs",
+        "title": "台北の熱門景點",
+        "text": "-",
+        "actions": [
+          {
+            "type": "uri",
+            "label": "siteA",
+            "uri": "https://A"
+          },
+          {
+            "type": "uri",
+            "label": "siteB",
+            "uri": "https://B"
+          },
+          {
+            "type": "uri",
+            "label": "site3",
+            "uri": "https://3"
+          }
+        ]
       },
       {
-        "type": "message",
-        "label": "熱門景點 2",
-        "text": "動作 2"
+        "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqOpZPEmmqtvRR4xFOlYUVWuZi9yFw3DKHTy76z66NIL1ikQzc",
+        "title": "新北の熱門景點",
+        "text": "-",
+        "actions": [
+          {
+            "type": "uri",
+            "label": "site4",
+            "uri": "https://4"
+          },
+          {
+            "type": "uri",
+            "label": "site5",
+            "uri": "https://5"
+          },
+          {
+            "type": "uri",
+            "label": "site6",
+            "uri": "https://6"
+          }
+        ]
       },
       {
-        "type": "message",
-        "label": "熱門景點 3",
-        "text": "動作 3"
+        "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLqibV1o_tAwNWSu6DWh57r_59rjFKSw2DeoqQBz1boK4UjMJe",
+        "title": "基隆の熱門景點",
+        "text": "-",
+        "actions": [
+          {
+            "type": "uri",
+            "label": "site7",
+            "uri": "https://7"
+          },
+          {
+            "type": "uri",
+            "label": "site8",
+            "uri": "https://8"
+          },
+          {
+            "type": "uri",
+            "label": "site9",
+            "uri": "https://9"
+          }
+        ]
       },
       {
-        "type": "message",
-        "label": "熱門景點 4",
-        "text": "動作 4"
+        "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYeQVxXXn3VlkY_kIQlr_fby3w_7Zs97EWj5z2hJ328WqmXiV5",
+        "title": "宜蘭の熱門景點",
+        "text": "-",
+        "actions": [
+          {
+            "type": "uri",
+            "label": "site10",
+            "uri": "https://10"
+          },
+          {
+            "type": "uri",
+            "label": "site11",
+            "uri": "https://11"
+          },
+          {
+            "type": "uri",
+            "label": "site12",
+            "uri": "https://12"
+          }
+        ]
+      },
+      {
+        "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMKmvF2tUJj13FVTM6XLINeyq20X8RMFrwhiDrRD7Q29aOD9qp",
+        "title": "桃園の熱門景點",
+        "text": "-",
+        "actions": [
+          {
+            "type": "uri",
+            "label": "site13",
+            "uri": "https://13"
+          },
+          {
+            "type": "uri",
+            "label": "site14",
+            "uri": "https://14"
+          },
+          {
+            "type": "uri",
+            "label": "site15",
+            "uri": "https://15"
+          }
+        ]
       }
-    ],
-    "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJBqZ60tcWFH5TvZ9KU5DEj7WBllMqRWnuc-ZouaONUFj08G7q",
-    "title": "推薦 の熱門景點",
-    "text": "-"
+    ]
   }
 }
-]
