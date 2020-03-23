@@ -1,0 +1,61 @@
+一.下載redis
+https://redis.io/download
+$ wget http://download.redis.io/releases/redis-5.0.7.tar.gz
+$ tar xzf redis-5.0.7.tar.gz
+$ cd redis-5.0.7
+執行make前要先確認是否有安裝gcc
+$ make
+
+Start server
+$ src/redis-server
+背景執行
+$ src/redis-server > /dev/null 2>&1 &
+連至local server
+$ src/redis-cli
+連至遠端server
+$ src/redis-cli -h 34.85.107.158 -p 6379
+
+二.若make失敗,出現gcc command not found,執行以下安裝
+$ yum -y update gcc
+$ yum -y install gcc+ gcc-c++
+
+
+三.連至遠端server時,把protected mode關掉:
+$ 127.0.0.1:6379>  CONFIG SET protected-mode no
+或者修改設定檔
+$vi redis.conf
+# When protected mode is on and if:
+# By default protected mode is enabled. You should disable it only if
+protected-mode yes  → No
+# If the master is password protected (using the "requirepass" configuration
+
+Connect to Remote Redis Server,修改Redis配置文件 ~/redis/redis.conf，找到bind那行配置：
+$vi ~/redis/redis.conf
+# bind 127.0.0.1
+a. 去掉#注释并改为：
+bind 0.0.0.0
+b. 指定配置文件然后重启Redis服务即可：
+
+四.使用Redis若遇到以下訊息,修改設定檔或用執行指令解決
+Problem:
+(error) MISCONF Redis is configured to save RDB snapshots, but it is currently not able to persist on disk. Commands that may modify the data set are disabled, because this instance is configured to report errors during writes if RDB snapshotting fails (stop-writes-on-bgsave-error option). Please check the Redis logs for details about the RDB error.
+執行指令
+$ 127.0.0.1:6379>  config set stop-writes-on-bgsave-error no
+修改設定檔 
+$ vi redis.conf
+#
+# However if you have setup your proper monitoring of the Redis server
+# and persistence, you may want to disable this feature so that Redis will
+# continue to work as usual even if there are problems with disk,
+# permissions, and so forth.
+#stop-writes-on-bgsave-error yes
+stop-writes-on-bgsave-error no
+
+五.防火牆設定
+iptables設定
+$ iptables -A INPUT -p tcp --dport 6379 -j ACCEPT
+$ iptables -A OUTPUT -p tcp --dport 6379 -j ACCEPT
+也可以刪除所有規則, redis就能遠端連線
+$ iptables -F
+
+
