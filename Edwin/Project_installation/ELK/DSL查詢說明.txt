@@ -1,0 +1,228 @@
+#查詢所有的index
+GET _cat/indices?v
+
+#查詢index stock-data中的所有資料
+GET stock-data*/_search
+{
+  "query":{
+    "match_all":{}
+  }
+}
+#?pretty讓輸入格式整齊易讀
+GET cars/_search?pretty
+
+#欄位查詢,term用來指定查詢欄位,maker是欄位名稱,找出maker是ford的資料
+GET cars/_search
+{
+  "query":{
+    "term": {
+      "maker": {
+        "value": "ford"
+      }
+    }
+  }
+}
+
+#欄位查詢-多值,同時查詢maker是ford跟opel的資料
+GET cars/_search
+{
+  "query":{
+    "terms": {
+      "maker": [
+        "ford",
+        "opel"
+      ]
+    }
+  }
+}
+
+#用must_not取代filter not
+#bool,條件查詢,查詢滿足條件的資料
+GET cars/_search
+{
+  "query":{
+    "bool": {
+      "must": [
+        {"terms":{"maker":["ford","open"]}}
+      ],
+      "must_not": {"term": {
+        "fuel_type": "gasoline"
+      }}
+    }
+  }
+}
+
+# *"_source":指定回傳顯示的欄位
+GET cars/_search
+{
+  "_source": ["date_created", "date_last_seen", "maker"], 
+  "query":{
+    "bool": {
+      "must": [
+        {"terms":{"maker":["ford","opel"]}}
+      ],
+      "must_not": {"term": {
+        "fuel_type": "gasoline"
+      }},
+      "filter": {"range": {
+        "date_created": {
+          "gte": "2015-11-10",
+          "lte": "2015-11-20"
+        }
+      }}
+    }
+  }
+}
+
+#should要配合minimum_should_match
+GET ltu-epa*/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {"match": {"item": "PM2.5"}},
+        {"match": {"item": "O3"}}
+      ]
+      ,
+      "filter": [
+        {"range":{
+          "DateTime":{"gt":"2016-01-01", 
+                      "lt":"2016-12-31"}}}
+      ],
+      "minimum_should_match" : 1
+    }
+  }
+}
+
+#by site&item 計算document數量
+POST /ltu-epa/_search
+{
+  "aggs": {
+    "by_Site": {
+      "terms": {
+        "field":"Site.keyword",
+        "size":5
+      },
+      "aggs":{
+        "by_item":{
+          "terms":{
+            "field":"item.keyword",
+            "size":5
+          }
+        }
+      }
+    }
+  }
+}
+
+#*by site&item 計算document數量&平均數
+GET /ltu-epa/_search
+{
+  "aggs": {
+    "by_Site": {
+      "terms": {
+        "field":"Site.keyword",
+        "size":5
+      },
+      "aggs":{
+        "by_item":{
+          "terms":{
+            "field":"item.keyword",
+            "size":5
+          },
+          "aggs":{
+            "average":{
+              "avg":{
+                "field":"Value"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+*使用查詢結果進行aggregate
+GET ltu-epa*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"item": "PM2.5"}}
+      ]
+      ,
+      "filter": [
+        {"range":{
+          "DateTime":{"gt":"2015-01-01", 
+                      "lt":"2015-12-31"}}}
+      ]
+    }
+  },
+  "aggs":{
+    "by_Site": {
+      "terms": {
+        "field":"Site.keyword",
+        "size":5
+      },
+      "aggs":{
+        "by_item":{
+          "terms":{
+            "field":"item.keyword",
+            "size":5
+          },
+          "aggs":{
+            "average":{
+              "avg":{
+                "field":"Value"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+#使用should查詢結果進行aggregate, should要配合minimum_should_match
+GET ltu-epa*/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {"match": {"item": "PM2.5"}},
+        {"match": {"item": "O3"}}
+      ]
+      ,
+      "filter": [
+        {"range":{
+          "DateTime":{"gt":"2016-01-01", 
+                      "lt":"2016-12-31"}}}
+      ],
+      "minimum_should_match" : 1
+    }
+  },
+  "aggs":{
+    "by_Site": {
+      "terms": {
+        "field":"Site.keyword",
+        "size":5
+      },
+      "aggs":{
+        "by_item":{
+          "terms":{
+            "field":"item.keyword",
+            "size":5
+          },
+          "aggs":{
+            "average":{
+              "avg":{
+                "field":"Value"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
